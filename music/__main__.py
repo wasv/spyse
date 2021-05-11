@@ -4,11 +4,12 @@ import random
 
 import mingus.extra.lilypond as LilyPond
 import mingus.midi.midi_file_out as MidiFileOut
+import mingus.midi.fluidsynth as FluidSynth
 
 from mingus.containers.note import Note
 from mingus.containers.composition import Composition
 
-random.seed("BACH")
+random.seed("Billie")
 
 n_cycles = 30
 pr = ["D", "F", "G#", "D#", "F#", "A", "C", "G", "A#", "C#", "E", "B"]
@@ -24,13 +25,15 @@ variants = [
 ]
 
 weights = [
-        20,
+        5,
         15,
         20,
         25,
-        5,
+        20,
         15,
 ]
+
+# Generate
 
 root = pr[0]
 p0 = to_seq(pr, root)
@@ -50,6 +53,8 @@ bass_seq.extend(p0)
 
 treble_track = to_track(treble_seq, Note(root, 4))
 bass_track = to_track(bass_seq, Note(root, 2))
+
+# Export
 
 treble_ly = LilyPond.from_Track(treble_track)
 bass_ly = LilyPond.from_Track(bass_track)
@@ -73,16 +78,21 @@ ly_track = f"""
       \\repeat unfold {n_cycles+1} {{s1 \\noBreak s1 \\noBreak s1 \\break}}
       {{ \\clef bass {bass_ly} }} >>
   >>
-  \\layout {{indent = 0mm}}
+  \\layout {{
+    indent = 0\\mm
+  }}
 }}
 
 }}
 """
 
-print(ly_track)
 LilyPond.to_pdf(ly_track, "comp.pdf")
 
 comp = Composition()
 comp.add_track(treble_track)
 comp.add_track(bass_track)
 MidiFileOut.write_Composition("comp.midi", comp)
+
+FluidSynth.init("/usr/share/soundfonts/default.sf2", file="comp.wav")
+FluidSynth.play_Composition(comp, channels=[0, 0])
+FluidSynth.stop_everything()

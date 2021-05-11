@@ -20,7 +20,6 @@ def get_row(p0, n, invert=False, retro=False):
         row = inverse(row)
     if retro:
         row = retrograde(row)
-    print(n)
     return xpose(row, n)
 
 

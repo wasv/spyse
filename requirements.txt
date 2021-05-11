@@ -1,1 +1,2 @@
 mingus ~= 0.5
+numpy
