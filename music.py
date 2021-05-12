@@ -49,13 +49,15 @@ def to_track(seq, root=Note("C", 4), instrument=None):
 if __name__ == "__main__":
     import random
 
+    from sys import argv
     from itertools import repeat
 
     import mingus.extra.lilypond as LilyPond
     import mingus.midi.fluidsynth as FluidSynth
     import mingus.midi.midi_file_out as MidiFileOut
 
-    random.seed("Billie")
+    if len(argv) > 1:
+        random.seed(argv[1])
 
     n_cycles = 30
     pr = ["D", "F", "G#", "D#", "F#", "A", "C", "G", "A#", "C#", "E", "B"]
