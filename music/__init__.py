@@ -3,11 +3,11 @@ from mingus.containers.track import Track
 
 
 def xpose(seq, offset):
-    return [(n + offset) % 12 for n in seq]
+    return [((n + offset) % 12, d) for n, d in seq]
 
 
 def inverse(seq):
-    return [(12 - n) % 12 for n in seq]
+    return [((12 - n) % 12, d) for n, d in seq]
 
 
 def retrograde(seq):
@@ -23,24 +23,23 @@ def get_row(p0, n, invert=False, retro=False):
     return xpose(row, n)
 
 
-def chords(row, n=4):
-    return tuple(row[i*n:(i+1)*n] for i in range(0, len(row)//n))
-
-
 def to_seq(row, root=None):
     if root is None:
-        root = row[0]
+        root = row[0][0]
     offset = int(Note(root))
-    return [(int(Note(n)) - offset) % 12 for n in row]
+    return [((int(Note(n)) - offset) % 12, d) for n, d in row]
 
 
 def to_names(seq, root="C"):
     offset = int(Note(root))
-    return [Note(offset + n).name for n in seq]
+    return [(Note(offset + n).name, d) for n, d in seq]
 
 
 def to_track(seq, root=Note("C", 4), instrument=None):
     track = Track(instrument)
     offset = int(root)
-    [track.add_notes(Note(offset + n)) for n in seq]
+    for n, d in seq:
+        if n is not None:
+            n = Note(offset + n)
+        track.add_notes(n, 1/d) 
     return track

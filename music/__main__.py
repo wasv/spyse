@@ -2,6 +2,8 @@ from . import get_row, to_seq, to_track
 
 import random
 
+from itertools import repeat
+
 import mingus.extra.lilypond as LilyPond
 import mingus.midi.midi_file_out as MidiFileOut
 import mingus.midi.fluidsynth as FluidSynth
@@ -23,32 +25,59 @@ variants = [
     (5, True,  True),
     (9, False, True),
 ]
-
-weights = [
-        5,
-        15,
-        20,
-        25,
-        20,
-        15,
+v_weights = [
+    5,
+    15,
+    20,
+    25,
+    20,
+    15,
 ]
+
+segments = [
+    [(None, 1)],
+    to_seq([("A#", 1/4), ("C",  1/4), ("D",  1/2)]),
+    to_seq([("D#", 1/4), ("C#", 1/4), ("F",  1/2)]),
+    to_seq([("G",  1/4), ("B",  3/8), ("B",  1/8), ("A",  1/4)]),
+    to_seq([("E",  1/4), ("F#", 3/8), ("F#", 1/8), ("G#", 1/4)]),
+    to_seq([("A#", 1/4), ("C",  1/4), ("C",  1/4), ("D",  1/4)]),
+    to_seq([("G",  1/4), ("G",  1/4), ("B",  1/4), ("A",  1/4)]),
+    to_seq([("E",  1/4), ("F#", 1/4), ("F#", 1/4), ("G#", 1/4)]),
+    to_seq([("D#", 1/4), ("D#", 1/4), ("C#", 1/4), ("E",  1/4)]),
+]
+s_weights = [
+    10,
+    20,
+    20,
+    5,
+    5,
+    10,
+    10,
+    10,
+    10,
+]
+
 
 # Generate
 
 root = pr[0]
-p0 = to_seq(pr, root)
+p0 = to_seq(zip(pr, repeat(1/4)), root)
 
 treble_seq = []
 bass_seq = []
 
-treble_seq.extend(p0)
+for s in random.choices(segments, weights=s_weights, k=3):
+    treble_seq.extend(s)
 bass_seq.extend(p0)
 
-for v in random.choices(variants, weights=weights, k=n_cycles):
-    treble_seq.extend(get_row(p0, *v))
-    bass_seq.extend(p0)
+for v in random.choices(variants, weights=v_weights, k=n_cycles):
+    for s in random.choices(segments, weights=s_weights, k=3):
+        treble_seq.extend(s)
+    row = get_row(p0, *v)
+    bass_seq.extend(row)
 
-treble_seq.extend(p0)
+for s in random.choices(segments, weights=s_weights, k=3):
+    treble_seq.extend(s)
 bass_seq.extend(p0)
 
 treble_track = to_track(treble_seq, Note(root, 4))
