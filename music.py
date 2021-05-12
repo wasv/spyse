@@ -52,8 +52,8 @@ if __name__ == "__main__":
     from itertools import repeat
 
     import mingus.extra.lilypond as LilyPond
-    import mingus.midi.midi_file_out as MidiFileOut
     import mingus.midi.fluidsynth as FluidSynth
+    import mingus.midi.midi_file_out as MidiFileOut
 
     random.seed("Billie")
 
@@ -101,7 +101,6 @@ if __name__ == "__main__":
         5,
     ]
 
-
     # Generate
 
     root = pr[0]
@@ -128,6 +127,15 @@ if __name__ == "__main__":
     bass_track = to_track(bass_seq, Note(root, 2))
 
     # Export
+
+    comp = Composition()
+    comp.add_track(treble_track)
+    comp.add_track(bass_track)
+    MidiFileOut.write_Composition("comp.midi", comp)
+
+    FluidSynth.init("/usr/share/soundfonts/default.sf2", file="comp.wav")
+    FluidSynth.play_Composition(comp, channels=[0, 0])
+    FluidSynth.stop_everything()
 
     treble_ly = LilyPond.from_Track(treble_track)
     bass_ly = LilyPond.from_Track(bass_track)
@@ -160,12 +168,3 @@ if __name__ == "__main__":
     """
 
     LilyPond.to_pdf(ly_track, "comp.pdf")
-
-    comp = Composition()
-    comp.add_track(treble_track)
-    comp.add_track(bass_track)
-    MidiFileOut.write_Composition("comp.midi", comp)
-
-    FluidSynth.init("/usr/share/soundfonts/default.sf2", file="comp.wav")
-    FluidSynth.play_Composition(comp, channels=[0, 0])
-    FluidSynth.stop_everything()
