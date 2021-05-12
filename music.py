@@ -148,7 +148,7 @@ if __name__ == "__main__":
       #(set-paper-size "letter")
     }}
     \\header {{
-      tagline = ##f
+      tagline = "Composed with Spyse"
     }}
 
     \\score {{
